@@ -9,22 +9,12 @@ package routers
 
 import (
 	"go-property-server/controllers"
+	"go-property-server/controllers/admin"
 
 	"github.com/astaxie/beego"
 )
 
 func init() {
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/object",
-			beego.NSInclude(
-				&controllers.ObjectController{},
-			),
-		),
-		beego.NSNamespace("/user",
-			beego.NSInclude(
-				&controllers.UserController{},
-			),
-		),
-	)
-	beego.AddNamespace(ns)
+	beego.Router("/", &controllers.TestController{}, "*:Index")
+	beego.Router("/admin", &admin.HomeController{}, "*:Index")
 }
