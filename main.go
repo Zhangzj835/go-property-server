@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "go-property-server/routers"
+	_ "go-property-server/sysinit"
 
 	"github.com/astaxie/beego"
 )
