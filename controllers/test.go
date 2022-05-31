@@ -9,6 +9,6 @@ type TestController struct {
 }
 
 func (c *TestController) Index() {
-	c.Data["json"] = map[string]string{"say": "hello worl"}
+	c.Data["json"] = map[string]string{"say": "hello world"}
 	c.ServeJSON()
 }

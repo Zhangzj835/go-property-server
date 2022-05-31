@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"go-property-server/enums"
 	"go-property-server/models"
 	"go-property-server/service"
@@ -10,7 +9,7 @@ import (
 )
 
 type LoginController struct {
-	BaseController
+	CommonController
 }
 
 // 登录
@@ -26,7 +25,6 @@ func (c *LoginController) Dologin() {
 		c.jsonResult("", enums.JRCodeFailed, "账号或密码不能为空")
 	}
 	userPwd = utils.String2md5(userPwd)
-	fmt.Println(userPwd)
 	// 获取数据
 	userInfo, _ := models.SysUserOneByUserName(userName)
 	// 校验账号密码
@@ -48,6 +46,14 @@ func (c *LoginController) Dologin() {
 
 // 退出登录
 func (c *LoginController) Logout() {
+	var token string
+	if c.Ctx.Request.Header["Token"] != nil {
+		token = c.Ctx.Request.Header["Token"][0]
+	}
+	if token == "" {
+		c.jsonResult("", enums.JRCodeFailed, "token为空")
+	}
+	service.DelToken(token)
 	result := map[string]string{"status": "ok"}
 	c.jsonResult(result, enums.JRCodeSucc, "")
 }

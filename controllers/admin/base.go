@@ -1,18 +1,15 @@
 package admin
 
 import (
-	"encoding/json"
-	"fmt"
 	"go-property-server/enums"
-	"go-property-server/models"
-
-	"github.com/astaxie/beego"
+	"go-property-server/service"
 )
 
 type BaseController struct {
-	beego.Controller
+	CommonController
 	controllerName string
 	actionName     string
+	tokenUserInfo  service.TokenUserInfo
 }
 
 func (c *BaseController) Prepare() {
@@ -23,22 +20,18 @@ func (c *BaseController) Prepare() {
 
 // 校验token
 func (c *BaseController) checkToken() {
-	fmt.Println("这里校验token")
-}
-
-// 统一结果输出
-func (c *BaseController) jsonResult(obj interface{}, code enums.JsonResultCode, msg string) {
-	res := &models.JsonResult{Code: code, Msg: msg, Obj: obj}
-	c.Data["json"] = res
-	c.ServeJSON()
-	c.StopRun()
-}
-
-// 解析请求参数
-func (c *BaseController) paseRequestBody(params interface{}) {
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, params)
-	if err != nil {
-		c.jsonResult(map[string]string{}, enums.JRCodeFailed, "参数格式错误")
-		return
+	var token string
+	if c.Ctx.Request.Header["Token"] != nil {
+		token = c.Ctx.Request.Header["Token"][0]
 	}
+	if token == "" {
+		c.jsonResult("", enums.JRCodeFailed, "token不能为空")
+	}
+	tokenUserInfo := service.CheckToken(token)
+	if tokenUserInfo.UserId == 0 {
+		c.jsonResult("", enums.JRCode10001, "token已过期")
+	} else {
+		c.tokenUserInfo = tokenUserInfo
+	}
+
 }
